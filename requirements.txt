@@ -1,0 +1,5 @@
+instaLooter
+tqdm
+scikit-learn
+numpy
+pillow
