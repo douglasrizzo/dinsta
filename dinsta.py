@@ -7,7 +7,7 @@ from shutil import copyfile, rmtree
 
 import numpy as np
 from PIL import Image, ImageChops
-from instaLooter import InstaLooter
+from instalooter.looters import ProfileLooter
 from skimage.io import imread
 from skimage.measure import compare_ssim
 from skimage.transform import resize
@@ -39,15 +39,15 @@ def download(username, path=None, videos=False, only_videos=False):
     if path is None:
         path = username
 
-    InstaLooter(
-        directory=path,
-        profile=username,
-        get_videos=videos,
-        videos_only=only_videos,
-        add_metadata=True,
-        template=stripped_username + '_{likescount}_{date}_{id}').download(
-            with_pbar=True)
+    looter = ProfileLooter(username, template=stripped_username + '_{likescount}_{date}_{id}')
 
+    try:
+        if not only_videos:
+            looter.download_pictures(destination=path)
+        if videos or only_videos:
+            looter.download_videos(destination=path)
+    except RuntimeError as e:
+        print(e.what())
 
 def list_dirs(paths):
     """Lists all the directories inside the given path. If a list is passed, the function iterates through every element and treats each one as a path inside the filesystem.
@@ -274,10 +274,10 @@ def process_dir(d, args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Custom Instagram scraper created to automate repetitive tasks I '
-        'used to do manually when using other scrapers. It is a simple script that '
-        'uses instaLooter under the hood, so in case of any questions regarding '
-        'interactions with Instagram or custom options to do more stuff, check '
-        'instaLooter. It might have what you need.')
+                    'used to do manually when using other scrapers. It is a simple script that '
+                    'uses instaLooter under the hood, so in case of any questions regarding '
+                    'interactions with Instagram or custom options to do more stuff, check '
+                    'instaLooter. It might have what you need.')
     parser.add_argument(
         'usernames', metavar='U', type=str, help='Instagram username (s)', nargs='+')
     parser.add_argument(
@@ -306,7 +306,7 @@ if __name__ == '__main__':
         '--normalize_likes',
         action='store_true',
         help='adds zero-padding to number of likes in file names. Useful when sorting in image '
-        'viewers that only have non-numerical sorting.')
+             'viewers that only have non-numerical sorting.')
     parser.add_argument(
         '-v',
         '--videos',
