@@ -8,6 +8,7 @@ from shutil import copyfile, rmtree
 import numpy as np
 from PIL import Image, ImageChops
 from instalooter.looters import ProfileLooter
+from instalooter.pbar import TqdmProgressBar
 from skimage.io import imread
 from skimage.measure import compare_ssim
 from skimage.transform import resize
@@ -43,9 +44,9 @@ def download(username, path=None, videos=False, only_videos=False):
 
     try:
         if not only_videos:
-            looter.download_pictures(destination=path)
+            looter.download_pictures(destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar)
         if videos or only_videos:
-            looter.download_videos(destination=path)
+            looter.download_videos(destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar)
     except RuntimeError as e:
         print(e.what())
 
