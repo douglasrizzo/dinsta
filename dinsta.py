@@ -1,8 +1,10 @@
 #!/usr/bin/env python3.6
 
 import argparse
+import hashlib
 import os
 from datetime import datetime
+from multiprocessing import Pool
 from shutil import copyfile, rmtree
 
 import numpy as np
@@ -13,7 +15,6 @@ from skimage.io import imread
 from skimage.measure import compare_ssim
 from skimage.transform import resize
 from tqdm import tqdm
-from multiprocessing import Pool
 
 
 def md5(fname):
@@ -40,7 +41,11 @@ def download(username, path=None, videos=False, only_videos=False):
     if path is None:
         path = username
 
-    looter = ProfileLooter(username, template=stripped_username + '_{likescount}_{date}_{id}')
+    looter = ProfileLooter(username=username,
+                get_videos=videos,
+                videos_only=only_videos,
+                add_metadata=True,
+                template=stripped_username + '_{likescount}_{date}_{id}')\
 
     try:
         if not only_videos:
@@ -48,7 +53,8 @@ def download(username, path=None, videos=False, only_videos=False):
         if videos or only_videos:
             looter.download_videos(destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar)
     except RuntimeError as e:
-        print(e.what())
+        print('there\'s no stopping the download train now!!')
+
 
 def list_dirs(paths):
     """Lists all the directories inside the given path. If a list is passed, the function iterates through every element and treats each one as a path inside the filesystem.
@@ -151,7 +157,7 @@ def load_images(files, size=None, gray=False):
     # progress bar for image loading procedure
     for x in tqdm(range(len(files)), desc='Loading images'):
         # grayscale and resize the images
-        img = imread(files[x], asgray=gray)
+        img = imread(files[x], as_grey=gray)
         if size is not None:
             img = resize(img, size)
         files[x] = (files[x], img)
@@ -185,9 +191,11 @@ def remove_duplicates(directory, threshold=.8):
 
     while len(files) > 0:
         p1, im1 = files[0]
+        # im1=im1[0]
 
         for p2, im2 in files[1:]:
             pbar.update()
+            # im2 = im2[0]
             if abs(im1[0, 0] - im2[0, 0]) > .1:
                 break
             if compare_ssim(im1, im2) > threshold:
