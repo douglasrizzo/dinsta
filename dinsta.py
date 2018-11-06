@@ -36,15 +36,9 @@ def download(username, path=None, videos=False, only_videos=False):
 
     try:
         if not only_videos:
-            looter.download_pictures(
-                destination=path,
-                pgpbar_cls=TqdmProgressBar,
-                dlpbar_cls=TqdmProgressBar)
+            looter.download_pictures(destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar)
         if videos or only_videos:
-            looter.download_videos(
-                destination=path,
-                pgpbar_cls=TqdmProgressBar,
-                dlpbar_cls=TqdmProgressBar)
+            looter.download_videos(destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar)
     except RuntimeError as e:
         if 'Query rate exceeded' in str(e):
             print(e)
@@ -56,25 +50,19 @@ def set_dates(paths):
     Dates are collected from the file name, if the files have been scraped by using this script."""
     for path in paths:
         _, file = os.path.split(path)
-        date = datetime.strptime(
-            file.split('_')[2], '%Y-%m-%d').timestamp()
+        date = datetime.strptime(file.split('_')[2], '%Y-%m-%d').timestamp()
         os.utime(path, (date, date))
 
 
 def normalize_likes(files):
-    zero_padding = len(
-        str(max(int(os.path.basename(f).split('_')[1]) for f in files)))
+    zero_padding = len(str(max(int(os.path.basename(f).split('_')[1]) for f in files)))
     for f in files:
         bits = f.split('_')
-        os.rename(f, bits[0] + '_' + bits[1].zfill(zero_padding) + '_' +
-                  bits[2] + '_' + bits[3])
+        os.rename(f, bits[0] + '_' + bits[1].zfill(zero_padding) + '_' + bits[2] + '_' + bits[3])
 
 
 def sort_by_std(directory, stds=4, window_size=None):
-    images = [
-        i.split('_')[1:3] + [i] for i in os.listdir(directory)
-        if i.endswith('.jpg')
-    ]
+    images = [i.split('_')[1:3] + [i] for i in os.listdir(directory) if i.endswith('.jpg')]
     for i in images:
         i[0] = int(i[0])
         i[1] = datetime.strptime(i[1], '%Y-%m-%d')
@@ -103,12 +91,10 @@ def sort_by_std(directory, stds=4, window_size=None):
         window_avg = np.average(interval)
         window_threshold = window_std * stds
 
-        img_name = str(int(
-            round(likes / window_avg, ndigits=3) * 1000)).zfill(6)
+        img_name = str(int(round(likes / window_avg, ndigits=3) * 1000)).zfill(6)
 
         if likes > window_avg * 1.5:
-            copyfile(directory + '/' + filename,
-                     directory + '/' + dir_name + '/' + img_name + '.jpg')
+            copyfile(directory + '/' + filename, directory + '/' + dir_name + '/' + img_name + '.jpg')
 
 
 def process_dir(d, args):
@@ -127,53 +113,26 @@ def process_dir(d, args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description=
-        'Custom Instagram scraper created to automate repetitive tasks I '
+        description='Custom Instagram scraper created to automate repetitive tasks I '
         'used to do manually when using other scrapers. It is a simple script that '
         'uses instaLooter under the hood, so in case of any questions regarding '
         'interactions with Instagram or custom options to do more stuff, check '
-        'instaLooter. It might have what you need.')
-    parser.add_argument(
-        'usernames',
-        metavar='U',
-        type=str,
-        help='Instagram username (s)',
-        nargs='+')
-    parser.add_argument(
-        '-d',
-        '--duplicates',
-        action='store_true',
-        help='removes duplicate images, keeping the one with highest resolution'
+        'instaLooter. It might have what you need.'
     )
-    parser.add_argument(
-        '-b',
-        '--borders',
-        action='store_true',
-        help='remove monochromatic image borders')
-    parser.add_argument(
-        '-t',
-        '--time',
-        action='store_true',
-        help='set image creation and modification time to Instagram post time')
-    parser.add_argument(
-        '-s',
-        '--sort',
-        action='store_true',
-        help='sort images by the std. dev. in like quantity')
+    parser.add_argument('usernames', metavar='U', type=str, help='Instagram username (s)', nargs='+')
+    parser.add_argument('-d', '--duplicates', action='store_true', help='removes duplicate images, keeping the one with highest resolution')
+    parser.add_argument('-b', '--borders', action='store_true', help='remove monochromatic image borders')
+    parser.add_argument('-t', '--time', action='store_true', help='set image creation and modification time to Instagram post time')
+    parser.add_argument('-s', '--sort', action='store_true', help='sort images by the std. dev. in like quantity')
     parser.add_argument(
         '-n',
         '--normalize_likes',
         action='store_true',
-        help=
-        'adds zero-padding to number of likes in file names. Useful when sorting in image '
-        'viewers that only have non-numerical sorting.')
-    parser.add_argument(
-        '-v', '--videos', action='store_true', help='download videos too')
-    parser.add_argument(
-        '-V',
-        '--only_videos',
-        action='store_true',
-        help='download only videos')
+        help='adds zero-padding to number of likes in file names. Useful when sorting in image '
+        'viewers that only have non-numerical sorting.'
+    )
+    parser.add_argument('-v', '--videos', action='store_true', help='download videos too')
+    parser.add_argument('-V', '--only_videos', action='store_true', help='download only videos')
 
     args = parser.parse_args()
 
