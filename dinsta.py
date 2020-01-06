@@ -125,8 +125,8 @@ if __name__ == '__main__':
         'interactions with Instagram or custom options to do more stuff, check '
         'instaLooter. It might have what you need.'
     )
-    parser.add_argument('usernames', metavar='U', type=str, help='Instagram username (s)', nargs='+')
-    parser.add_argument('-d', '--duplicates', action='store_true', help='removes duplicate images, keeping the one with highest resolution')
+    parser.add_argument('-u', '--usernames', type=str, help='Instagram username (s)', nargs='+')
+    parser.add_argument('-f', '--folders', type=str, help='Folders with pictures (s)', nargs='+')
     parser.add_argument(
         '-d',
         '--duplicates',
@@ -159,13 +159,22 @@ if __name__ == '__main__':
 
     # get list of usernames
     users = args.usernames
+    folders = []
+
+    if users is not None:
+        # scroll through usernames
+        for i, user in enumerate(users):
+            # downloads files
+            print('Downloading {0} {1}/{2}...'.format(user, i + 1, len(users)))
+            download(user, videos=args.videos, only_videos=args.only_videos)
+            folders.append(user)
+
+    if args.folders is not None:
+        folders += args.folders
 
     # scroll through usernames
-    for i, user in enumerate(users):
-
+    for i, folder in enumerate(folders):
         # downloads files
-        print('Downloading {0} {1}/{2}...'.format(user, i + 1, len(users)))
-        download(user, videos=args.videos, only_videos=args.only_videos)
-        d = os.path.abspath(user)
+        d = os.path.abspath(folder)
         # processes all additional command-line arguments as if the directory already existed
         process_dir(d, args)
