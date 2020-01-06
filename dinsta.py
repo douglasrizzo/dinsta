@@ -36,9 +36,13 @@ def download(username, path=None, videos=False, only_videos=False):
 
     try:
         if not only_videos:
-            looter.download_pictures(destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar)
+            looter.download_pictures(
+                destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar
+            )
         if videos or only_videos:
-            looter.download_videos(destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar)
+            looter.download_videos(
+                destination=path, pgpbar_cls=TqdmProgressBar, dlpbar_cls=TqdmProgressBar
+            )
     except RuntimeError as e:
         if 'Query rate exceeded' in str(e):
             print(e)
@@ -94,7 +98,9 @@ def sort_by_std(directory, stds=4, window_size=None):
         img_name = str(int(round(likes / window_avg, ndigits=3) * 1000)).zfill(6)
 
         if likes > window_avg * 1.5:
-            copyfile(directory + '/' + filename, directory + '/' + dir_name + '/' + img_name + '.jpg')
+            copyfile(
+                directory + '/' + filename, directory + '/' + dir_name + '/' + img_name + '.jpg'
+            )
 
 
 def process_dir(d, args):
@@ -121,9 +127,24 @@ if __name__ == '__main__':
     )
     parser.add_argument('usernames', metavar='U', type=str, help='Instagram username (s)', nargs='+')
     parser.add_argument('-d', '--duplicates', action='store_true', help='removes duplicate images, keeping the one with highest resolution')
-    parser.add_argument('-b', '--borders', action='store_true', help='remove monochromatic image borders')
-    parser.add_argument('-t', '--time', action='store_true', help='set image creation and modification time to Instagram post time')
-    parser.add_argument('-s', '--sort', action='store_true', help='sort images by the std. dev. in like quantity')
+    parser.add_argument(
+        '-d',
+        '--duplicates',
+        action='store_true',
+        help='removes duplicate images, keeping the one with highest resolution'
+    )
+    parser.add_argument(
+        '-b', '--borders', action='store_true', help='remove monochromatic image borders'
+    )
+    parser.add_argument(
+        '-t',
+        '--time',
+        action='store_true',
+        help='set image creation and modification time to Instagram post time'
+    )
+    parser.add_argument(
+        '-s', '--sort', action='store_true', help='sort images by the std. dev. in like quantity'
+    )
     parser.add_argument(
         '-n',
         '--normalize_likes',
