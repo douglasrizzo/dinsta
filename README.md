@@ -1,6 +1,6 @@
 # Custom Instagram scraper
 
-Custom Instagram scraper created to automate repetitive tasks I used to do manually when using other scrapers. It is a simple script that uses instaLooter under the hood, so in case of any questions regarding interactions with Instagram or custom options to do more stuff, check instaLooter. It might have what you need.
+Custom Instagram scraper created to automate repetitive tasks I used to do manually when using other scrapers. It is a simple script that uses instalooter under the hood, so in case of any questions regarding interactions with Instagram or custom options to do more stuff, check instalooter. It might have what you need.
 
 	positional arguments:
 	  U                     Instagram username (s)
